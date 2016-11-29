@@ -1,5 +1,8 @@
 package com.design.observer.observers;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import com.design.observer.others.DisplayElement;
 import com.design.observer.subject.WeatherData;
 
@@ -10,20 +13,13 @@ public class ForecastDisplay implements DisplayElement, Observer {
 	private float currentPressure = 29.2f;
 	private float lastPressure;
 	@Setter
-	private WeatherData weatherData;
+	private Observable observable;
 
-	public ForecastDisplay(WeatherData weatherData){
-		setWeatherData(weatherData);
-		this.weatherData.registerObserver(this);
+	public ForecastDisplay(Observable observable){
+		setObservable(observable);
+		this.observable.addObserver(this);
 	}
 	
-	@Override
-	public void update(float temp, float humidity, float pressures) {
-		lastPressure = currentPressure;
-		currentPressure = pressures;
-		display();
-	}
-
 	@Override
 	public void display() {
 		System.out.print("Forecast: ");
@@ -33,6 +29,18 @@ public class ForecastDisplay implements DisplayElement, Observer {
 			System.out.println("More of the same");
 		} else if (currentPressure < lastPressure) {
 			System.out.println("Watch out for cooler, rainy weather");
+		}
+	}
+
+	@Override
+	public void update(Observable obs, Object arg) {
+		if(obs instanceof WeatherData){
+			WeatherData weatherData = (WeatherData) obs;
+			float pressures = weatherData.getPressure();
+			
+			lastPressure = currentPressure;
+			currentPressure = pressures;
+			display();
 		}
 	}
 
